@@ -1,3 +1,5 @@
+import { logger } from "./logger.js";
+
 // types
 type Topic = string;
 type Message = { user: string; messageId: string; content: any };
@@ -6,7 +8,7 @@ type Listener = (message: Message) => void;
 // functions
 function logMessage(topic: Topic, message: Message): void {
   const currentTime = new Date().toISOString();
-  console.log(
+  logger.info(
     `Message received [${topic}][${currentTime}][${message.user}][${message.messageId}][${message.content}]`
   );
 }
