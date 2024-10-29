@@ -16,7 +16,7 @@ function delay(ms: number): Promise<void> {
 }
 
 async function simulateProcessing() {
-  await delay(2000); // Simulate a 2-second delay
+  await delay(500); // Simulate a 2-second delay
 }
 
 export { Message, Topic, Listener, logMessage, simulateProcessing };

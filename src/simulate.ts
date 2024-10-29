@@ -21,11 +21,26 @@ function subscriberAndLogTopicActivity(topic: Topic) {
 // Subscribe to outbound topics to log processed messages
 outboundTopics.forEach(subscriberAndLogTopicActivity);
 
+function workComplete(): boolean {
+  return false;
+}
+
+// when the flow is completed place another order
+pubSub.subscribe("T4", (message) => {
+  if (!workComplete()) {
+    pubSub.publish("T1", {
+      ...message,
+      messageId: uuidv4(),
+      content: "Order Book Command",
+    });
+  }
+});
+
 users.forEach((user) => {
   // Publish a message to `t1`
   pubSub.publish("T1", {
     user: user,
     messageId: uuidv4(),
-    content: `Order Book Command`,
+    content: "Order Book Command",
   });
 });
