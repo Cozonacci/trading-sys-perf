@@ -1,4 +1,5 @@
-import { Message, PubSub } from "./pubSub.js";
+import { logMessage, Message, simulateProcessing } from "./domainModels.js";
+import { PubSub } from "./pubSub.js";
 
 class Processor {
   constructor(private pubSub: PubSub) {
@@ -6,16 +7,25 @@ class Processor {
   }
 
   private init(): void {
-    // Listen to topic `t1`
     this.pubSub.subscribe("T1", this.processMessage.bind(this));
   }
 
   private processMessage(message: Message): void {
-    console.log(`Received on t1: ${message}`);
+    logMessage("T1", message);
 
-    this.pubSub.publish("T2", `Processed Message T2: ${message}`);
-    this.pubSub.publish("T3", `Processed Message T3: ${message}`);
-    this.pubSub.publish("T4", `Processed Message T4: ${message}`);
+    // simulate heavy processing in SUT
+    simulateProcessing().then(() => {
+      [
+        { topic: "T2", status: "Received" },
+        { topic: "T3", status: "Confirmed" },
+        { topic: "T4", status: "Processed" },
+      ].forEach((item) => {
+        this.pubSub.publish(item.topic, {
+          ...message,
+          content: `${message.content} ${item.status}`,
+        });
+      });
+    });
   }
 }
 

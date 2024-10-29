@@ -1,26 +1,31 @@
+import { logMessage, Topic } from "./domainModels.js";
 import { Processor } from "./processor.js";
 import { PubSub } from "./pubSub.js";
+import { v4 as uuidv4 } from "uuid";
 
 // Initialize the PubSub system
 const pubSub = new PubSub();
-
-// Create the Processor that listens to `t1` and publishes to `t2`
+// Create the SUT Processor
 const processor = new Processor(pubSub);
+// Users
+const users = ["user1", "user2", "user3"];
+// Topics
+const outboundTopics = ["T2", "T3", "T4"];
+
+function subscriberAndLogTopicActivity(topic: Topic) {
+  pubSub.subscribe(topic, (message) => {
+    logMessage(topic, message);
+  });
+}
 
 // Subscribe to outbound topics to log processed messages
-pubSub.subscribe("T2", (message) => {
-  console.log(`Received on T2: ${message}`);
-});
-pubSub.subscribe("T3", (message) => {
-  console.log(`Received on T3: ${message}`);
-});
-pubSub.subscribe("T4", (message) => {
-  console.log(`Received on T4: ${message}`);
-});
+outboundTopics.forEach(subscriberAndLogTopicActivity);
 
-// Publish a message to `t1`
-pubSub.publish("T1", "ORDER BOOK COMMAND");
-
-// Output:
-// Received on t1: Hello, Topic 1!
-// Received on t2: Processed: Hello, Topic 1!
+users.forEach((user) => {
+  // Publish a message to `t1`
+  pubSub.publish("T1", {
+    user: user,
+    messageId: uuidv4(),
+    content: `Order Book Command`,
+  });
+});

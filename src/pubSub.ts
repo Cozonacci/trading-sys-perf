@@ -1,6 +1,4 @@
-type Message = any;
-type Topic = string;
-type Listener = (message: Message) => void;
+import { Listener, Message, Topic } from "./domainModels.js";
 
 class PubSub {
   private topics: { [key: string]: Array<Listener> } = {};
@@ -25,4 +23,4 @@ class PubSub {
   }
 }
 
-export { Message, PubSub };
+export { PubSub };
