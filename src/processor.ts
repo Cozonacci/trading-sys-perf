@@ -20,9 +20,11 @@ class Processor {
         { topic: "T3", status: "Confirmed" },
         { topic: "T4", status: "Processed" },
       ].forEach((item) => {
-        this.pubSub.publish(item.topic, {
-          ...message,
-          content: `${message.content} ${item.status}`,
+        simulateProcessing().then(() => {
+          this.pubSub.publish(item.topic, {
+            ...message,
+            content: `${message.content} ${item.status}`,
+          });
         });
       });
     });

@@ -13,12 +13,16 @@ function logMessage(topic: Topic, message: Message): void {
   );
 }
 
+function getRandomNumber(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function simulateProcessing() {
-  await delay(500); // Simulate a 2-second delay
+  await delay(getRandomNumber(400, 600));
 }
 
 export { Message, Topic, Listener, logMessage, simulateProcessing };

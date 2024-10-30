@@ -1,7 +1,9 @@
 import { LogEntry, readAndParsePinoLog } from "./logParse.js";
+import { parse, writeToPath } from "fast-csv";
 
 type TransationId = string;
 type TopicEvent = { topic: number; time: string };
+type Duration = { start: string; end: string };
 
 // stores transactions
 const transactions = new Map<TransationId, Array<TopicEvent>>();
@@ -30,9 +32,41 @@ function loadTransactions(logs: LogEntry[]) {
   });
 }
 
+const transactionDuration = new Map<TransationId, Duration>();
+
+function calculateDuration(topicEvents: Array<TopicEvent>): Duration {
+  const result = { start: "", end: "" };
+  topicEvents.forEach((ev) => {
+    if (ev.topic === 1) {
+      result.start = ev.time;
+    }
+    if (ev.topic === 4) {
+      result.end = ev.time;
+    }
+  });
+  return result;
+}
+
+function processTransactions() {
+  transactions.forEach((topicEvents, transactionId) => {
+    transactionDuration.set(transactionId, calculateDuration(topicEvents));
+  });
+}
+
 (async () => {
   const logPath = "./logs/app.log";
   const parsedTransactionsFromLog = await readAndParsePinoLog(logPath);
   loadTransactions(parsedTransactionsFromLog);
+  processTransactions();
+  const transactionsAsCSV = Array.from(transactionDuration, ([key, value]) => ({
+    transactionsId: key,
+    start: value.start,
+    end: value.end,
+  }));
   console.log("Aggreagate Transactions", transactions);
+  console.log("Processed Transactions", transactionDuration);
+  console.log("CSV", transactionsAsCSV);
+  writeToPath("./report/transactions.csv", transactionsAsCSV, {
+    headers: true,
+  }).on("finish", () => console.log("CSV file written successfully"));
 })();

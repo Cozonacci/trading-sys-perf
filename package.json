@@ -16,6 +16,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "fast-csv": "^5.0.2",
     "pino": "^9.5.0",
     "pino-pretty": "^11.3.0",
     "uuid": "^11.0.2"
